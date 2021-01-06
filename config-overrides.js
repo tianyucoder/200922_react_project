@@ -1,4 +1,4 @@
-const { override, fixBabelImports,addLessLoader } = require('customize-cra');
+const { override, fixBabelImports,addLessLoader,addPostcssPlugins } = require('customize-cra');
 
 module.exports = override(
   fixBabelImports('import', {
@@ -15,4 +15,5 @@ module.exports = override(
 			},
 		}
 	}),
+	addPostcssPlugins([require("postcss-px2rem")({ remUnit: 375/10 })])
 );

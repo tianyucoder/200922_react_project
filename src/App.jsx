@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
+import './App.less'
 
 export default class App extends Component {
 	render() {
 		return (
-			<div>
-				
-			</div>
+			<div className="demo"></div>
 		)
 	}
 }
