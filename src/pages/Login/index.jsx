@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { NavBar, InputItem,Button,Toast } from 'antd-mobile';
+import axios from 'axios'
 import {phoneReg,codeReg} from '../../config/reg'
 import {codeTime} from '../../config/contants'
 import './index.less'
@@ -55,7 +56,20 @@ export default class Login extends Component {
 				this.setState({canClick:true,time:codeTime})
 			}
 		},1000)
-		console.log('发送请求获取验证码')
+		axios.post('/login/digits',{phone}).then(
+			response => {
+				const {code,message} = response.data
+				if(code === 20000) Toast.success(message,2)
+				else if(code !== 20000) Toast.fail(message,2)
+			},
+			error => {
+				Toast.fail('阿偶，网络不通，稍后再试',2)
+				//清除定时器
+				clearInterval(this.timeId)
+				//让按钮再次可以点击
+				this.setState({canClick:true,time:codeTime})
+			}
+		)
 	}
 	render() {
 		const {canClick,time} = this.state
