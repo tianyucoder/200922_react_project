@@ -10,8 +10,8 @@ module.exports = override(
 		lessOptions:{
 			javascriptEnabled: true, //允许js修改antd的less文件
 			modifyVars: { 
-				'@brand-primary': 'green',
-				'@brand-primary-tap' :'rgb(0, 95, 0)'
+				'@brand-primary': '#E1251B',
+				'@brand-primary-tap' :'#ac1d15'
 			},
 		}
 	}),
