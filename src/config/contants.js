@@ -1,1 +1,1 @@
-export const codeTime = 10 //验证码冷冻时间
+export const codeTime = 60 //验证码冷冻时间

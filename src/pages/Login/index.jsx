@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { NavBar, InputItem,Button,Toast } from 'antd-mobile';
-import axios from 'axios'
+import {reqVerifyCode} from '../../ajax/verify'
+import {reqLogin} from '../../ajax/login'
 import {phoneReg,codeReg} from '../../config/reg'
 import {codeTime} from '../../config/contants'
 import './index.less'
@@ -13,7 +14,7 @@ export default class Login extends Component {
 		canClick:true //标识按钮是否可以点击
 	}
 	//登录按钮的回调
-	login = ()=>{
+	login = async()=>{
 		const {phone,code} = this.state
 		this.phoneError = false
 		this.codeError = false
@@ -23,7 +24,21 @@ export default class Login extends Component {
 		errMsg += this.phoneError ? ' 手机号' : ''
 		errMsg += this.codeError ? ' 验证码' : ''
 		if(errMsg) return Toast.fail('请输入合法的'+errMsg)
-		console.log(`发起登录请求，手机号为${phone}，验证码为${code}`)
+		//请求登录
+		try {
+			const {data} = await reqLogin(phone,code)
+			//若登录成功
+			if(data.code === 20000) {
+				//提示登录成功
+				Toast.success(data.message,2)
+				console.log(data)
+				//跳转到个人中心
+				this.props.history.push('/user')
+			}
+			else if(data.code !== 20000) Toast.fail(data.message,2)
+		} catch (error) {
+			Toast.fail('阿偶，网络不通，稍后再试',2)
+		}
 	}
 	//保存用户输入的数据
 	saveData = (type)=>{
@@ -34,7 +49,7 @@ export default class Login extends Component {
 		}
 	}
 	//获取验证码按钮的回调
-	getCode = ()=>{
+	getCode = async()=>{
 		//从状态中获取按钮状态、时间
 		const {canClick,phone} = this.state
 		//判断按钮是否可以点击
@@ -56,20 +71,21 @@ export default class Login extends Component {
 				this.setState({canClick:true,time:codeTime})
 			}
 		},1000)
-		axios.post('/login/digits',{phone}).then(
-			response => {
-				const {code,message} = response.data
-				if(code === 20000) Toast.success(message,2)
-				else if(code !== 20000) Toast.fail(message,2)
-			},
-			error => {
-				Toast.fail('阿偶，网络不通，稍后再试',2)
-				//清除定时器
-				clearInterval(this.timeId)
-				//让按钮再次可以点击
-				this.setState({canClick:true,time:codeTime})
-			}
-		)
+		//请求获取验证码
+		try {
+			const {data:{code,message}} = await reqVerifyCode(phone)
+			if(code === 20000) Toast.success(message,2)
+			else if(code !== 20000) Toast.fail(message,2)
+		} catch (error) {
+			Toast.fail('阿偶，网络不通，稍后再试',2)
+			//清除定时器
+			clearInterval(this.timeId)
+			//让按钮再次可以点击
+			this.setState({canClick:true,time:codeTime})
+		}
+	}
+	componentWillUnmount(){
+		clearInterval(this.timeId)
 	}
 	render() {
 		const {canClick,time} = this.state
