@@ -5,3 +5,5 @@ import axios from 'axios'
  * @param {*} phone 
  */
 export const reqVerifyCode =  phone => axios.post('/login/digits',{phone})
+
+export const reqVerifyLogin =  () => axios.post('/login/verify')
